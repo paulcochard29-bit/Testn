@@ -1,0 +1,115 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(SEAFARER)
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  seafarer  SeafarerProfile?
+  company   Company?
+  applications Application[]
+  subscriptions Subscription[]
+}
+model SeafarerProfile {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @unique
+  ranks      String[]
+  certificates String[]
+  seaHours   Int      @default(0)
+  zones      String[]
+  languages  String[]
+  bio        String?
+}
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  country   String?
+  verified  Boolean  @default(false)
+  logoUrl   String?
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String   @unique
+  vessels   Vessel[]
+  jobs      Job[]
+}
+model Vessel {
+  id         String  @id @default(cuid())
+  company    Company @relation(fields: [companyId], references: [id])
+  companyId  String
+  name       String
+  type       String
+  lengthM    Int?
+  engineKw   Int?
+  imo        String?
+  flag       String?
+  photoUrl   String?
+  mmsi       String? // prêt pour AIS
+}
+model Job {
+  id           String   @id @default(cuid())
+  company      Company  @relation(fields: [companyId], references: [id])
+  companyId    String
+  vessel       Vessel?  @relation(fields: [vesselId], references: [id])
+  vesselId     String?
+  title        String
+  rank         String
+  description  String
+  contractType String
+  startDate    DateTime?
+  durationDays Int?
+  salaryMin    Int?
+  salaryMax    Int?
+  currency     String?  @default("EUR")
+  zone         String?
+  requirements String[]
+  publishedAt  DateTime @default(now())
+  expiresAt    DateTime?
+  planType     String?
+  applications Application[]
+}
+model Application {
+  id          String @id @default(cuid())
+  job         Job    @relation(fields: [jobId], references: [id])
+  jobId       String
+  user        User   @relation(fields: [userId], references: [id])
+  userId      String
+  status      String @default("submitted")
+  message     String?
+  createdAt   DateTime @default(now())
+}
+model Plan {
+  id        String  @id @default(cuid())
+  forRole   String
+  name      String
+  priceCents Int
+  period    String
+  benefits  String[]
+}
+model Subscription {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  plan       Plan     @relation(fields: [planId], references: [id])
+  planId     String
+  status     String   @default("active")
+  currentPeriodEnd DateTime?
+  createdAt  DateTime @default(now())
+}
+model Alert {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  criteria   Json
+  active     Boolean  @default(true)
+}
+enum Role { SEAFARER RECRUITER ADMIN }
