@@ -11,7 +11,10 @@
     "allowJs": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["*"] } 
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
