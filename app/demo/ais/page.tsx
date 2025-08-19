@@ -1,5 +1,5 @@
 
-import MapAIS from '../../components/MapAIS'
+import MapAIS from '@/components/MapAIS'
 export default function AISDemo(){
   return (
     <main className="container py-6">
