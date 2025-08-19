@@ -1,6 +1,6 @@
 
-import { prisma } from '../../../lib/prisma'
-import MapAIS from '../../../components/MapAIS'
+import { prisma } from '@/lib/prisma'
+import MapAIS from '@/components/MapAIS'
 export default async function CompanyPage({ params }: { params: { id: string }}) {
   const company = await prisma.company.findUnique({ where: { id: params.id }, include: { vessels: true, jobs: true } })
   if (!company) return <div className="container py-6">Entreprise introuvable</div>
